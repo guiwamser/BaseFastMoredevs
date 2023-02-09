@@ -16,19 +16,19 @@ from core.deps import get_session
 router = APIRouter()
 
 #GET Aluno
-@router.get('/{aluno_id}', response_model=ProfessorSchema, status_code = status.HTTP_200_OK)
-async def get_aluno(aluno_id: int, db: AsyncSession = Depends(get_session)):
+@router.get('/{professor_id}', response_model=ProfessorSchema, status_code = status.HTTP_200_OK)
+async def get_aluno(professor_id: int, db: AsyncSession = Depends(get_session)):
     async with db as session:
-        query = select(ProfessorModel).filter(ProfessorModel.id == aluno_id)
+        query = select(ProfessorModel).filter(ProfessorModel.id == professor_id)
         result = await session.execute(query)
-        aluno = result.scalar_one_or_none()
+        professor = result.scalar_one_or_none()
 
-        if aluno:
-            return aluno
+        if professor:
+            return professor
         else:
-            raise HTTPException(detail='Aluno Nao Encontrado', status_code=status.HTTP_404_NOT_FOUND)
+            raise HTTPException(detail='Professor Nao Encontrado', status_code=status.HTTP_404_NOT_FOUND)
 
-#GET Professor
+#GET Professores
 @router.get('/', response_model=List[ProfessorSchema])
 async def get_professor(db: AsyncSession = Depends(get_session)):
 
@@ -40,9 +40,9 @@ async def get_professor(db: AsyncSession = Depends(get_session)):
         return professores
 
 
-# Post aluno
+#Post Professor
 @router.post('/', status_code=status.HTTP_201_CREATED, response_model=ProfessorSchema)
-async def post_aluno(aluno: ProfessorSchema, db: AsyncSession = Depends(get_session)):
+async def post_professor(professor: ProfessorSchema, db: AsyncSession = Depends(get_session)):
 
     novo_professor = ProfessorModel( nome = professor.nome, email = professor.email)
 
@@ -69,3 +69,18 @@ async def put_professor(professor_id: int, professor: ProfessorSchema, db: Async
         else:
             raise HTTPException(detail='Professor Nao Encontrado', status_code=status.HTTP_404_NOT_FOUND)
        
+
+#DELETE professor
+@router.delete('/{professor_id}', status_code=status.HTTP_204_NO_CONTENT)
+async def delete_professor(professor_id: int, db: AsyncSession = Depends(get_session)):
+    async with db as session:
+        query = select(ProfessorModel).filter(ProfessorModel.id ==professor_id)
+        result = await session.execute(query)
+        professor_del = result.scalar_one_or_none()
+
+        if professor_del:
+            await session.delete(professor_del)
+            await session.commit()
+            return Response(status_code=status.HTTP_204_NO_CONTENT)
+        else:
+            raise HTTPException(detail='Professor Nao Encontrado', status_code=status.HTTP_404_NOT_FOUND)
