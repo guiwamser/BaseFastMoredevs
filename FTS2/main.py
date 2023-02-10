@@ -4,7 +4,7 @@ from core.configs import settings
 
 from api.v1.api import api_router
 
-app = FastAPI(title="API MOREDEVS")
+app = FastAPI(title="API DOS GURI")
 app.include_router(api_router, prefix=settings.API_STR)
 
 if __name__ == '__main__':
